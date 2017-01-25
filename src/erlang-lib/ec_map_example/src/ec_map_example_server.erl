@@ -6,7 +6,7 @@
 %% Maps
 %% module trafo-example {
 %%  namespace "http://cisco.com/ns/genet/examples/transforms";
-%% to 
+%% to
 %% module trafo-example-device {
 %%  namespace "http://cisco.com/ns/genet/examples/transforms/device";
 %%
@@ -461,7 +461,7 @@ get_mappings(HLPath) when is_list(HLPath) ->
                       fupval=fun(_,_,LLVals,_) -> ec_genet:join_pick_not_equals(not_found,LLVals) end,
                       fdnval=fun(_,_,HLVal,_) -> ec_genet:dup(2,HLVal) end
                      };
-        [c,{KC},a,'split-by-cols',lists,structure,?HLROOT] ->            
+        [c,{KC},a,'split-by-cols',lists,structure,?HLROOT] ->
             #mappings{inherit=tl(HLPath),
                       nested=[#mappings{path=[m,{KC},k,'split-by-cols',lists,structure,?LLROOT]},
                               #mappings{path=[m,{KC},l,'split-by-cols',lists,structure,?LLROOT]}]
@@ -594,8 +594,9 @@ get_mappings(HLPath) when is_list(HLPath) ->
         %% has no inner list instances).  For the latter two parts we are using
         %% composition of pre- and post- hook mappings generator.
         [a,'flat-list-to-nested','nested-lists',structure,?HLROOT] ->
+            LLPath = [k,'flat-list-to-nested','nested-lists',structure,?LLROOT],
             #mappings{get_next=fun(Tctx,_,Next,_) ->
-                                      ec_genet:nested_list_next(Tctx, [k,'flat-list-to-nested','nested-lists',structure,?LLROOT], [m], Next)
+                                      ec_genet:nested_list_next(Tctx, LLPath, [m], Next)
                                end};
         [{B,C},a,'flat-list-to-nested','nested-lists',structure,?HLROOT] ->
             LLBase = [{B},k,'flat-list-to-nested','nested-lists',structure,?LLROOT],
@@ -846,7 +847,7 @@ get_mappings(HLPath) when is_list(HLPath) ->
             #mappings{inherit=tl(HLPath),
                       relpath=[X]};
 
-        %% The pattern below matches all other paths in the 
+        %% The pattern below matches all other paths in the
         %% trafo-examples.yang model. We return none for mapping
         %% record, which makes genet return not_found for any request.
         _ ->

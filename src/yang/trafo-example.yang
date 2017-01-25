@@ -16,7 +16,7 @@ module trafo-example {
   identity example-identity-id3 {
     base example-identity-base;
   }
-  
+
   container example-domain {
 
 //////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ module trafo-example {
            need to be mapped. This p-container is direct mapped to
            an LL path with no other transformation.
            PERFECT mapping.";
-        presence 
+        presence
           "Creation/deletion of this p-container is an act of
            configuration.";
       }
@@ -96,7 +96,7 @@ module trafo-example {
       }
       container choice-in-choice {
         description
-          "Sometimes we see choices in choices. 
+          "Sometimes we see choices in choices.
            This example happens to be logically equivalent to the
            single choice case above.
            Each member of a choice statement need to be mapped in
@@ -217,8 +217,8 @@ module trafo-example {
 //////////////////////////////////////////////////////////////////////
 
     container value {
-      container constant { 
-        description 
+      container constant {
+        description
           "This leaf is mapped to a constant value 4711,
            because it has no LL model counterpart. We issue an
            operator error if set to anything else.
@@ -425,7 +425,7 @@ module trafo-example {
         }
       }
     }
-    container existence { 
+    container existence {
       container constant {
         description
           "The leaf is not mapped, it never exists.  Existence checks always
@@ -659,7 +659,7 @@ module trafo-example {
             type uint32 {
               range '1..999';
             }
-          }          
+          }
         }
       }
       container lists {

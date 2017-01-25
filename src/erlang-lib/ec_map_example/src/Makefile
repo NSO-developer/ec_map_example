@@ -1,4 +1,4 @@
-include $(NCS_DIR)/src/ncs/build/include.ncs.mk 
+include $(NCS_DIR)/src/ncs/build/include.ncs.mk
 include ../vsn.mk
 
 APP_NAME   = ec_map_example

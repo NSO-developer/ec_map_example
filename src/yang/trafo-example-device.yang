@@ -284,6 +284,14 @@ module trafo-example-device {
           type int32;
         }
       }
+      container value-to-two-empty {
+        container k {
+          presence k;
+        }
+        container l {
+          presence l;
+        }
+      }
     }
     container address {
       container constant {

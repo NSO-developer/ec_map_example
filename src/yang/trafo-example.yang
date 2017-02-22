@@ -503,6 +503,19 @@ module trafo-example {
           }
         }
       }
+      container value-to-two-empty {
+        description
+          "Here we are mapping a two-valued enumeration to two empty
+           leaves.  It is not perfect, since the LL model allows that
+           both leaves exists, this cannot be reflected in HL.
+           APPROXIMATION mapping.";
+        leaf a {
+          type enumeration {
+            enum v1;
+            enum v2;
+          }
+        }
+      }
     }
     container address {
       container constant {

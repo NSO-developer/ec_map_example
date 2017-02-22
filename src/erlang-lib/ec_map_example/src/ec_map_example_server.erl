@@ -744,6 +744,16 @@ get_mappings(HLPath) when is_list(HLPath) ->
                                                       fupval=fun(_,_,[Val,_],_) -> Val end},
                                             [k,'case-map',existence,?LLROOT],
                                             ?CONFD_ENUM_VALUE(?exdev_case_e));
+        [a,'value-to-two-empty',existence,?HLROOT] ->
+            ec_genet_mapgens:address_map(
+              #mappings{nested =
+                            [ec_genet_mapgens:to_existence([k,'value-to-two-empty',existence,?LLROOT],
+                                                           not_found, true),
+                             ec_genet_mapgens:to_existence([l,'value-to-two-empty',existence,?LLROOT],
+                                                           not_found, true)]},
+              [{?CONFD_ENUM_VALUE(?ex_v1), [true, not_found]},
+               {?CONFD_ENUM_VALUE(?ex_v2), [not_found, true]},
+               {not_found, [not_found, not_found]}]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Address Domain Mappings

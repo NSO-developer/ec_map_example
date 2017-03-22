@@ -568,6 +568,26 @@ module trafo-example {
           }
         }
       }
+      container key-to-keys {
+        description
+          "The HL list has one key and LL list two, and we want to map
+           the mandatory HL leaf to the value of the second LL key.
+           APPROXIMATION mapping - the LL allows states that cannot be
+           represented in HL.";
+        list a {
+          key b;
+          leaf b {
+            type string;
+          }
+          leaf c {
+            type int32;
+            mandatory true;
+          }
+          leaf d {
+            type boolean;
+          }
+        }
+      }
       container key-offset {
         list a {
           description

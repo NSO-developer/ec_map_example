@@ -762,6 +762,40 @@ get_mappings(HLPath) when is_list(HLPath) ->
         [a,constant,address,?HLROOT] ->
             #mappings{path=[k,constant,address,?LLROOT]};
 
+        [a,'key-to-keys',address,?HLROOT] ->
+            #mappings{path=[k,'key-to-keys',address,?LLROOT],
+                     fupkeys=fun(_,_,false,_) -> false;
+                                (_,_,{K1,_K2},_) -> {K1} end};
+        [{_},a,'key-to-keys',address,?HLROOT] ->
+            #mappings{path=[{},k,'key-to-keys',address,?LLROOT], % {} will be replaced
+                     fdnkeys=fun key_to_keys/3};
+        [b,{_},a,'key-to-keys',address,?HLROOT] ->
+            #mappings{path=[l,{},k,'key-to-keys',address,?LLROOT], % {} will be replaced
+                     fdnkeys=fun key_to_keys/3};
+        [c,{K},a,'key-to-keys',address,?HLROOT] ->
+            %% this is the most troublesome case - we need to find the
+            %% value of the other key on get_elem, or copy the tree on
+            %% set_elem
+            #mappings{path=[m,{},k,'key-to-keys',address,?LLROOT], % {} will be replaced
+                     fdnkeys=fun key_to_keys/3,
+                     set_elem=fun(Tctx, _, K2, _) ->
+                                      LLPath = [k,'key-to-keys',address,?LLROOT],
+                                      New = {K,K2},
+                                      %% fetch the existing LL keyset first
+                                      case key_to_keys(Tctx, [{K}], none) of
+                                          [New] ->
+                                              ok; % nothing to do
+                                          [Old] ->
+                                              %% note there must be something already
+                                              ec_genet:copy_tree(Tctx, [Old|LLPath], [New|LLPath]),
+                                              ec_genet:delete(Tctx, [Old|LLPath])
+                                      end
+                              end};
+        [d,{_},a,'key-to-keys',address,?HLROOT] ->
+            Map = #mappings{path=[n,{},k,'key-to-keys',address,?LLROOT], % {} will be replaced
+                           fdnkeys=fun key_to_keys/3},
+            ec_genet_mapgens:to_existence(Map, false, true);
+
         %% For a list to list mapping where key value needs to be adjusted, we just need
         %% to provide fupkeys for the list itself (to be used when get_next is processed)
         %% and to map the key value in the path
@@ -871,6 +905,13 @@ binary2hexstring(Bin) ->
 hexstring2binary(BString) ->
     Bytes = string:tokens(binary_to_list(BString), ":"),
     list_to_binary(lists:map(fun(StrByte) -> list_to_integer(StrByte, 16) end, Bytes)).
+
+key_to_keys(Tctx, [{K}], _) ->
+    C = ec_genet:init_cursor(Tctx, [k,'key-to-keys',address,?LLROOT]),
+    case econfd_maapi:find_next(C, ?CONFD_FIND_NEXT, {K}) of
+        {ok, {K,K2}, _} -> [{K,K2}];
+        _ -> [{K,0}] % the LL instance does not exist; start with 0
+    end.
 
 %%%===================================================================
 %%% End

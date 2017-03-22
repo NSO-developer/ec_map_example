@@ -335,6 +335,20 @@ module trafo-example-device {
           }
         }
       }
+      container key-to-keys {
+        list k {
+          key "l m";
+          leaf l {
+            type string;
+          }
+          leaf m {
+            type int32;
+          }
+          leaf n {
+            type empty;
+          }
+        }
+      }
       container key-offset {
         list l {
           key k;

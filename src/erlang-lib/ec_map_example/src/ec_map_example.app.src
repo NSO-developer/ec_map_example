@@ -7,6 +7,6 @@
   {modules, [%MODULES%]},
   {mod, {ec_map_example, []}},
   {registered, [ec_map_example_server]},
-  {applications, [stdlib, kernel]},
+  {applications, [stdlib, kernel, ec_genet]},
   {env, [{ncs_restart_type,permanent}]}
  ]}.

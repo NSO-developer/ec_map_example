@@ -66,6 +66,39 @@
     ?Error:.*"Only the value 179 is supported"
     -[Ee][Rr][Rr][Oo][Rr]
 
+    !do show running-config example-domain address key-to-keys a
+    ?$noentries
+    !example-domain address key-to-keys a abcd c 12
+    [invoke commit]
+    !do show running-config example-domain address key-to-keys a
+    """?
+    .*do show running-config.*
+    example-domain address key-to-keys a abcd
+     c 12
+     d false
+    !
+    $cfg_prompt
+    """
+    !example-domain address key-to-keys a abcd c 13 d true
+    [invoke commit]
+    !do show running-config example-domain address key-to-keys a
+    """?
+    .*do show running-config.*
+    example-domain address key-to-keys a abcd
+     c 13
+     d true
+    !
+    $cfg_prompt
+    """
+    !do show running-config example-device address key-to-keys
+    """?
+    .*do show running-config.*
+    example-device address key-to-keys k abcd 13
+     n
+    !
+    $cfg_prompt
+    """
+
     [invoke test-ex-common "address key-offset a" 0 $noentries]
     [invoke test-ex-common "address key-offset a" 7 0]
     !do show running-config example-device address key-offset

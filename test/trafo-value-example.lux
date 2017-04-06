@@ -192,6 +192,11 @@
     [invoke verify-ex-device "existence case-map k" case-e]
     [invoke verify-ex-device-noexists "existence case-map m"]
 
+    [invoke test-ex-common "existence value-to-two-empty a" v1 $noentries]
+    [invoke verify-ex-device "existence value-to-two-empty" k]
+    [invoke test-ex-common "existence value-to-two-empty a" v2 v1]
+    [invoke verify-ex-device "existence value-to-two-empty" l]
+
 [cleanup]
     [invoke genet_cli]
     !config

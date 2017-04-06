@@ -1,19 +1,22 @@
 
 [config require=NCS_DIR]
-[config timeout=25000]
-[config cleanup_timeout=25000]
+[config timeout=2000]
+[config cleanup_timeout=2000]
+
+[global oper_prompt=genet-oper#]
+[global cfg_prompt=genet-cfg#]
 
 [macro oper-prompt]
-    ?genet-oper#
+    ?^genet-oper#
 [endmacro]
 [macro cfg-prompt]
-    ?genet-cfg#
+    ?^genet-cfg#
 [endmacro]
 [macro set-prompts]
     ?#
-    !prompt1 "genet-oper# "
+    !prompt1 $oper_prompt
     [invoke oper-prompt]
-    !prompt2 "genet-cfg# "
+    !prompt2 $cfg_prompt
     [invoke oper-prompt]
 [endmacro]
 
@@ -27,7 +30,6 @@
     !ncs_cli -u admin -C
     ?admin connected
     [invoke set-prompts]
-    [invoke oper-prompt]
 [endmacro]
 
 [macro genet_cli_initial]

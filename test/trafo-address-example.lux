@@ -63,7 +63,7 @@
     # failure regexp would match - unset it for a moment
     -
     !example-domain address key-constant a ijkl 12
-    ?Error:.*"Only the value 179 is supported"
+    ?Error:.*Only the value 179 is supported
     -[Ee][Rr][Rr][Oo][Rr]
 
     !do show running-config example-domain address key-to-keys a

@@ -877,5 +877,21 @@ module trafo-example {
         }
       }
     }
+    container operational {
+      config false;
+      container keyless {
+        description
+          "The example shows how a LL list can be presented as a
+           keyless list.  The assumption is that there exists 1:1
+           mapping from unsigned integers to LL key values; in this
+           example we assume the LL string key values are actually the
+           encoded numbers.";
+        list a {
+          leaf b {
+            type string;
+          }
+        }
+      }
+    }
   }
 }

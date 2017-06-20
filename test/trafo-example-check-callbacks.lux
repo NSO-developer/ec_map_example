@@ -7,10 +7,18 @@
     !no example-domain
     !commit
     ?Commit complete|No modifications to commit
+[shell callbacks]
+    !ncs_cmd -o -u admin -mc 'mdel /example-device/operational'
+    !echo deleted: $$?
+    ?deleted: 0
     # check callbacks for empty configuration; the argument is a path or namespace
     [invoke check-callbacks /example-domain]
 
     # now populate some parts of the data model
+    !ncs_load -C -l -m < keyless.xml
+    !echo loaded: $$?
+    ?loaded: 0
+[shell genet_cli]
     """!
     example-domain direct leaf-string a abcd
     example-domain direct leaf-empty a
@@ -35,3 +43,9 @@
     !no example-domain
     !commit
     ?Commit complete|No modifications to commit
+    !exit
+    !exit
+    ?SH-PROMPT
+    !ncs_cmd -o -u admin -mc 'mdel /example-device/operational'
+    !echo deleted: $$?
+    ?deleted: 0

@@ -9,7 +9,7 @@
     !commit
     ?Commit complete|No modifications to commit
 
-    # address tests
+    [progress address tests]
 
     [invoke test-ex-common "address constant a" 23 $noentries]
 
@@ -112,7 +112,8 @@
 
     # TODO: no lookup table tests
 
-    # structure domain tests
+    [progress structure domain tests]
+
     !no example-domain structure
     !commit
     ?Commit complete|No modifications to commit
@@ -350,7 +351,7 @@
     genet-cfg#
     """
 
-    # structure/nesting domain tests
+    [progress structure/nesting domain tests]
 
     !no example-domain nesting
     !commit
@@ -388,6 +389,25 @@
     genet-cfg#
     """
 
+    [progress operational tests]
+[shell load]
+    !ncs_load -C -l -m < keyless.xml
+    !echo loaded: $$?
+    ?loaded: 0
+[shell genet_cli]
+    !do show example-domain operational
+    """?
+    B *
+    ------
+    abcd *
+    efgh *
+    ijkl *
+    mnop *
+    qrst *
+    uvwx *
+    yz *
+    """
+
     # TODO: implement
 
 [cleanup]
@@ -401,3 +421,9 @@
     [invoke verify-ex-device-noexists address]
     [invoke verify-ex-device-noexists structure]
     [invoke verify-ex-device-noexists nesting]
+    !exit
+    !exit
+    ?SH-PROMPT
+    !ncs_cmd -o -u admin -mc 'mdel /example-device/operational'
+    !echo deleted: $$?
+    ?deleted: 0

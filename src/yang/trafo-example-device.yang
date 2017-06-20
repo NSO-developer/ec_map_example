@@ -532,5 +532,19 @@ module trafo-example-device {
         }
       }
     }
+    container operational {
+      config false;
+      container keyless {
+        list k {
+          key x;
+          leaf x {
+            type int32;
+          }
+          leaf l {
+            type string;
+          }
+        }
+      }
+    }
   }
 }

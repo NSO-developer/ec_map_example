@@ -891,11 +891,31 @@ get_mappings(HLPath) when is_list(HLPath) ->
             #mappings{inherit=tl(HLPath),
                       relpath=[X]};
 
+        [a,keyless,operational,?HLROOT] ->
+            Path = [k,keyless,operational,?LLROOT],
+            #mappings{get_next=fun(Tctx,_,C,_) -> enumerate_list(Tctx, C, Path) end};
+        %% existence check (may not be necessary)
+        [{?CONFD_INT64(X)},a,keyless,operational,?HLROOT] ->
+            #mappings{path=[{X},k,keyless,operational,?LLROOT]};
+        [b,{?CONFD_INT64(X)},a,keyless,operational,?HLROOT] ->
+            #mappings{path=[l,{X},k,keyless,operational,?LLROOT]};
+
+
         %% The pattern below matches all other paths in the
         %% trafo-examples.yang model. We return none for mapping
         %% record, which makes genet return not_found for any request.
         _ ->
             none
+    end.
+
+enumerate_list(Tctx, -1, Path) ->
+    enumerate_list(Tctx, {ec_genet:init_cursor(Tctx,Path), 0}, Path);
+enumerate_list(_Tctx, {C,Ix}, _Path) ->
+    case ec_genet:get_next(C) of
+        not_found ->
+            {false, undefined};
+        {_Key, CC} ->
+            {{?CONFD_INT64(Ix)}, {CC, Ix+1}}
     end.
 
 binary2hexstring(Bin) ->

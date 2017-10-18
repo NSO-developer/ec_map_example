@@ -151,7 +151,7 @@
     [invoke test-types ipv6-prefix 2001:db8:85a3::/64]
 
     [invoke test-types leaf-list "[ 2 3 4 ]"]
-    !example-domain types leaf-list a [ ]
+    !no example-domain types leaf-list
     [invoke commit]
     !do show running-config example-domain types leaf-list
     ?No entries found

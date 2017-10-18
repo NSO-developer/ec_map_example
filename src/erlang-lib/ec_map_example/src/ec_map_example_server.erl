@@ -170,8 +170,12 @@ get_mappings(HLPath) when is_list(HLPath) ->
             #mappings{path=[t,r,'choice-in-choice',direct,?LLROOT]};
 
         %% a leaf-list is mapped pretty much the same as a leaf (in simple cases)
+        %% since nso-4.5/confd-6.5: it is much more like a list
         [a,'leaf-list',direct,?HLROOT] ->
             #mappings{path=[k,'leaf-list',direct,?LLROOT]};
+        [{Value},a,'leaf-list',direct,?HLROOT] ->
+            #mappings{inherit=tl(HLPath),
+                      relpath=[{Value}]};
 
         %% for a list, we need to map the list, list instance, the first key leaf, and the
         %% ordinary leaves or containers, if any
@@ -269,17 +273,10 @@ get_mappings(HLPath) when is_list(HLPath) ->
                              end};
 
         [a,'leaf-list',types,?HLROOT] ->
-            #mappings{path=[k,'leaf-list',types,?LLROOT],
-                      fdnval=fun(_,_,?CONFD_LIST(List),_) ->
-                                     Length = length(List),
-                                     First = case List of
-                                                 [?CONFD_UINT8(X)|_Rest] -> X;
-                                                 [] -> "(empty)"
-                                             end,
-                                     ?LOGMSG("Received a leaf-list instance, checking the first element",
-                                             Length, First),
-                                     ?CONFD_LIST(List)
-                             end};
+            #mappings{path=[k,'leaf-list',types,?LLROOT]};
+        [{Value},a,'leaf-list',types,?HLROOT] ->
+            #mappings{inherit=tl(HLPath),
+                      relpath=[{Value}]};
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -329,6 +326,9 @@ get_mappings(HLPath) when is_list(HLPath) ->
 
         [a,'leaf-list',types,value,?HLROOT] ->
             ec_genet_mapgens:leaf_list_map([k,'leaf-list',types,value,?LLROOT], ?C_INT8, ?C_UINT8);
+        [{?CONFD_INT8(Val)},a,'leaf-list',types,value,?HLROOT] ->
+            %% only used for ncs-4.5/confd-6.5 or higher
+            #mappings{path=[{?CONFD_UINT8(Val)},k,'leaf-list',types,value,?LLROOT]};
 
         [a,'string-to-binary',representation,value,?HLROOT] ->
             #mappings{path=[k,'string-to-binary',representation,value,?LLROOT],

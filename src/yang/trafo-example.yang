@@ -833,6 +833,14 @@ module trafo-example {
           leaf b { type uint32; }
         }
       }
+      container leaf-to-list {
+        description
+          "Mapping a leaf to a single instance in a LL list.
+           APPROXIMATION mapping.";
+        leaf a {
+          type string;
+        }
+      }
     }
     container nesting {
       container address-value {

@@ -512,6 +512,14 @@ module trafo-example-device {
       container list-to-leaf-list {
         leaf-list k { type uint32; }
       }
+      container leaf-to-list {
+        list k {
+          key l;
+          leaf l {
+            type string;
+          }
+        }
+      }
     }
     container nesting {
       container address-value {

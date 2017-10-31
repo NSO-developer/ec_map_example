@@ -373,6 +373,9 @@
     genet-cfg#
     """
 
+    [invoke test-ex-common "structure leaf-to-list a" abcd $noentries]
+    
+
     [progress structure/nesting domain tests]
 
     !no example-domain nesting

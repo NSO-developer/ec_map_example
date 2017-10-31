@@ -644,6 +644,9 @@ get_mappings(HLPath) when is_list(HLPath) ->
                                                         end
                                                 end)};
 
+        [a,'leaf-to-list',structure,?HLROOT] ->
+            ec_genet_mapgens:leaf_to_list_instance([k,'leaf-to-list',structure,?LLROOT], l);
+
         %% For getting the value from LL, we need to look into both cases and pick the
         %% right result.  For setting the value, we send the value to the right case; but
         %% since something needs to be sent to both sub-mappings, we send a 'not_found'

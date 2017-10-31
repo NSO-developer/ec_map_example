@@ -351,6 +351,28 @@
     genet-cfg#
     """
 
+    [invoke test-ex-common "structure list-to-leaf-list a" 123 $noentries]
+    !example-domain structure list-to-leaf-list a 124
+    [invoke commit]
+    !do show running-config example-domain structure list-to-leaf-list
+    """?
+    do show.*
+    example-domain structure list-to-leaf-list a 123
+    !
+    example-domain structure list-to-leaf-list a 124
+    !
+    genet-cfg#
+    """
+    !no example-domain structure list-to-leaf-list a 123
+    [invoke commit]
+    !do show running-config example-domain structure list-to-leaf-list
+    """?
+    do show .*
+    example-domain structure list-to-leaf-list a 124
+    !
+    genet-cfg#
+    """
+
     [progress structure/nesting domain tests]
 
     !no example-domain nesting

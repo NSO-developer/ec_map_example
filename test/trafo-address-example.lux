@@ -125,6 +125,9 @@
     [invoke test-ex-common "structure leafs one-to-multiple-parts a" 10.1.2.0/24 $noentries]
     [invoke verify-ex-device "structure leafs one-to-multiple-parts k" 10.1.2.0]
     [invoke verify-ex-device "structure leafs one-to-multiple-parts l" 255.255.255.0]
+    [invoke test-ex-common "structure leafs one-to-multiple-parts a" 2001::/64 10.1.2.0/24]
+    [invoke verify-ex-device "structure leafs one-to-multiple-parts k" 2001::]
+    [invoke verify-ex-device "structure leafs one-to-multiple-parts l" ffff:ffff:ffff:ffff::]
 
     !do show running-config example-domain structure leafs many-to-one a
     ?$noentries

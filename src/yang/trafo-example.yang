@@ -661,12 +661,13 @@ module trafo-example {
         container one-to-multiple-parts {
           description
             "
-            We are mappping a IPv4 prefix (one leaf) to subnet IPv4
+            We are mappping a IP prefix (one leaf) to subnet IP
             address and a mask (two leaves).  PERFECT mapping
             (assuming the subnet address and mask have the standard
-            properties).";
+            properties, and that LL values are either both IPv4 or
+            both IPv6).";
           leaf a {
-            type inet:ipv4-prefix;
+            type inet:ip-prefix;
           }
         }
         container many-to-one {

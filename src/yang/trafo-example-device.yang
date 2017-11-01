@@ -397,10 +397,10 @@ module trafo-example-device {
         }
         container one-to-multiple-parts {
           leaf k {
-            type inet:ipv4-address;
+            type inet:ip-address;
           }
           leaf l {
-            type inet:ipv4-address;
+            type inet:ip-address;
           }
         }
         container many-to-one {

@@ -443,12 +443,8 @@ get_mappings(HLPath) when is_list(HLPath) ->
         %% ought not to choose this mode unless we modify the
         %% keys somehow to make them unique.
         [a,'split-by-cols',lists,structure,?HLROOT] ->
-            #mappings{get_next=fun ec_genet:composite_list_get_next/4,
-                      extra=[{composite_list_get_next_mode,union},
-                             {composite_list_get_next,
-                              [[k,'split-by-cols',lists,structure,?LLROOT],
-                               [l,'split-by-cols',lists,structure,?LLROOT]]}]
-                     };
+            ec_genet_mapgens:composite_list([[k,'split-by-cols',lists,structure,?LLROOT],
+                                             [l,'split-by-cols',lists,structure,?LLROOT]]);
         %% Here we chose to map the key to both LL list k and list l
         %% So creation, reading and all will be directed to both
         %% lists. The fupval and fdnval functions are used to combine
@@ -476,18 +472,8 @@ get_mappings(HLPath) when is_list(HLPath) ->
         %% discriminator leaf is set, we need to delete/create entries in the LL
         %% lists and copy the contents
         [a,union,'split-by-rows',lists,structure,?HLROOT] ->
-            #mappings{nested=[#mappings{get_next=fun ec_genet:composite_list_get_next/4,
-                                        extra=[{composite_list_get_next_mode,union},
-                                               {composite_list_get_next,
-                                                [[ipv4,union,'split-by-rows',lists,structure,?LLROOT],
-                                                 [ipv6,union,'split-by-rows',lists,structure,?LLROOT]]}]
-                                       }],
-                      fupkeys=fun(_,_,[{false,undefined}],_) ->
-                                      {false,undefined};
-                                 (_,_,[{Key,C}],_) ->
-                                      {Key,C}
-                              end
-                     };
+            ec_genet_mapgens:composite_list([[ipv4,union,'split-by-rows',lists,structure,?LLROOT],
+                                             [ipv6,union,'split-by-rows',lists,structure,?LLROOT]]);
         [{KB},a,union,'split-by-rows',lists,structure,?HLROOT] ->
             #mappings{nested=[#mappings{path=[{KB},ipv4,union,'split-by-rows',lists,structure,?LLROOT]},
                               #mappings{path=[{KB},ipv6,union,'split-by-rows',lists,structure,?LLROOT]}],
@@ -530,21 +516,13 @@ get_mappings(HLPath) when is_list(HLPath) ->
         %% missing key for the HL list entry is given by the LL source of the entry, hence
         %% we need to know where the key originated - using composite_list_key_fn
         [a,join,'split-by-rows',lists,structure,?HLROOT] ->
-            #mappings{nested=[#mappings{get_next=fun ec_genet:composite_list_get_next/4,
-                                        extra=[{composite_list_get_next_mode,each},
-                                               {composite_list_get_next,
-                                                [[ipv4,join,'split-by-rows',lists,structure,?LLROOT],
-                                                 [ipv6,join,'split-by-rows',lists,structure,?LLROOT]]},
-                                               {composite_list_key_fn,
-                                                fun({Appl},[ipv4|_]) -> {Appl, ?CONFD_ENUM_VALUE(?ex_ipv4)};
-                                                   ({Appl},[ipv6|_]) -> {Appl, ?CONFD_ENUM_VALUE(?ex_ipv6)} end}]
-                                       }],
-                      fupkeys=fun(_,_,[{false,undefined}],_) ->
-                                      {false,undefined};
-                                 (_,_,[{Key,C}],_) ->
-                                      {Key,C}
-                              end
-                     };
+            ec_genet_mapgens:composite_list(
+              [#mappings{path=[ipv4,join,'split-by-rows',lists,structure,?LLROOT],
+                         fupkeys=fun(_,_,false,_) -> false;
+                                    (_,_,{Appl},_) -> {Appl, ?CONFD_ENUM_VALUE(?ex_ipv4)} end},
+               #mappings{path=[ipv6,join,'split-by-rows',lists,structure,?LLROOT],
+                         fupkeys=fun(_,_,false,_) -> false;
+                                    (_,_,{Appl},_) -> {Appl, ?CONFD_ENUM_VALUE(?ex_ipv6)} end}]);
         [{Appl,?CONFD_ENUM_VALUE(?ex_ipv4)},a,join,'split-by-rows',lists,structure,?HLROOT] ->
             #mappings{path=[{Appl},ipv4,join,'split-by-rows',lists,structure,?LLROOT]};
         [{Appl,?CONFD_ENUM_VALUE(?ex_ipv6)},a,join,'split-by-rows',lists,structure,?HLROOT] ->

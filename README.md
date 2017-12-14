@@ -7,8 +7,7 @@ models.  How to use it:
 
    * add `ec_genet` and `ec_map_example` as project's remote packages (in
      `project-meta-data.xml`) like this:
-
-    ```
+```
      <package>
       <name>ec_genet</name>
       <git>
@@ -21,7 +20,7 @@ models.  How to use it:
         <repo>ssh://git@github.com/NSO-developer/ec_map_example.git</repo>
       </git>
     </package>
-    ```
+```
 
    * run `ncs-project update`
 

@@ -1,4 +1,4 @@
-include $(NCS_DIR)/src/ncs/build/include.ncs.mk
+include ../../../include.mk
 include ../vsn.mk
 
 APP_NAME   = ec_map_example
@@ -14,15 +14,15 @@ MODULES    = $(ERL_FILES:%.erl=%)
 EBIN_FILES = $(MODULES:%=../ebin/%.beam) ../ebin/$(APP_NAME).app
 
 $(NS_DIR)/%.hrl: $(YANG_DIR)/%.yang
-	$(NCSC) --emit-hrl $@ `ls $*-ann.yang  > /dev/null 2>&1 && echo "-a $*-ann.yang"` \
-		--yangpath $(NCS_DIR)/src/ncs/yang \
-		--strict-yang --fail-on-warnings $<
+	$(COMPILER) --emit-hrl $@ \
+		--yangpath $(SYSTEM_DIR)/src/$(SYSTEM)/yang \
+		--fail-on-warnings $<
 
 ERLC       = erlc
 ERLC_FLAGS := \
 	+debug_info \
 	-I $(GENET)/src/erlang-lib/ec_genet/include -I $(NS_DIR) \
-	-pa $(NCS_DIR)/erlang/econfd/ebin \
+	-pa $(SYSTEM_DIR)/erlang/econfd/ebin \
 	-pa ../../ec_map_example/ebin
 
 # mvolf: turned off errors for no-logging
@@ -30,11 +30,7 @@ ERLC_FLAGS := \
 
 APPSCRIPT = '$$vsn=shift; $$mods=""; while(@ARGV){ $$_=shift; s/^([A-Z].*)$$/\'\''$$1\'\''/; $$mods.=", " if $$mods; $$mods .= $$_; } while(<>) { s/%VSN%/$$vsn/; s/%MODULES%/$$mods/; print; }'
 
-all: $(NCS_DIR)/erlang/econfd/ebin $(NS_FILES) $(EBIN_FILES)
-
-$(NCS_DIR)/erlang/econfd/ebin:
-	@echo 'Where is NCS installed? Set $$NCS_DIR to point it out!'
-	exit 1
+all: $(SYSTEM_DIR)/erlang/econfd/ebin $(NS_FILES) $(EBIN_FILES)
 
 clean:
 	rm -f $(EBIN_FILES) $(NS_FILES) erl_crash.dump core* *~

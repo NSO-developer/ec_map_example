@@ -15,7 +15,7 @@
     [invoke check-callbacks /example-domain]
 
     # now populate some parts of the data model
-    !ncs_load -C -l -m < keyless.xml
+    !ncs_load -O -l -m < keyless.xml
     !echo loaded: $$?
     ?loaded: 0
 [shell genet_cli]

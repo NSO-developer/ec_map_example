@@ -169,8 +169,7 @@ get_mappings(HLPath) when is_list(HLPath) ->
         [j,h,'choice-in-choice',direct,?HLROOT] ->
             #mappings{path=[t,r,'choice-in-choice',direct,?LLROOT]};
 
-        %% a leaf-list is mapped pretty much the same as a leaf (in simple cases)
-        %% since nso-4.5/confd-6.5: it is much more like a list
+        %% a leaf-list is mapped much like a list
         [a,'leaf-list',direct,?HLROOT] ->
             #mappings{path=[k,'leaf-list',direct,?LLROOT]};
         [{Value},a,'leaf-list',direct,?HLROOT] ->
@@ -188,6 +187,13 @@ get_mappings(HLPath) when is_list(HLPath) ->
         [b,{X},a,list,direct,?HLROOT] ->
             #mappings{path=[l,{X},k,list,direct,?LLROOT]};
 
+        %% ordered leaf-list mapped to ordered leaf-list does not
+        %% require any special handling
+        [a,'ordered-leaf-list',direct,?HLROOT] ->
+            #mappings{path=[k,'ordered-leaf-list',direct,?LLROOT]};
+        [{Value},a,'ordered-leaf-list',direct,?HLROOT] ->
+            #mappings{inherit=tl(HLPath),
+                      relpath=[{Value}]};
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Types Example Mappings
@@ -333,8 +339,12 @@ get_mappings(HLPath) when is_list(HLPath) ->
         [a,'string-to-binary',representation,value,?HLROOT] ->
             #mappings{path=[k,'string-to-binary',representation,value,?LLROOT],
                       %% we need to convert the value and change the type tag
-                      fupval=ec_genet:value_fun(fun(?CONFD_BINARY(LLVal)) -> ?CONFD_BUF(binary2hexstring(LLVal)) end),
-                      fdnval=ec_genet:value_fun(fun(?CONFD_BUF(HLVal)) -> ?CONFD_BINARY(hexstring2binary(HLVal)) end)};
+                      fupval=ec_genet:value_fun(fun(?CONFD_BINARY(LLVal)) ->
+                                                        ?CONFD_BUF(binary2hexstring(LLVal))
+                                                end),
+                      fdnval=ec_genet:value_fun(fun(?CONFD_BUF(HLVal)) ->
+                                                        ?CONFD_BINARY(hexstring2binary(HLVal))
+                                                end)};
         %% No need to convert anything, done automatically
         [a,'integer-to-string',representation,value,?HLROOT] ->
             #mappings{path=[k,'integer-to-string',representation,value,?LLROOT]};
@@ -411,7 +421,8 @@ get_mappings(HLPath) when is_list(HLPath) ->
             LLPath = [k,'many-to-one',leafs,structure,?LLROOT],
             #mappings{path=LLPath,
                       fupval=ec_genet:value_fun(fun(V) ->
-                                                        list_to_integer(hd(string:tokens(binary_to_list(V), ":")))
+                                                        Tokens = string:tokens(binary_to_list(V), ":"),
+                                                        list_to_integer(hd(Tokens))
                                                 end),
                       fdnval=fun(Tctx,_,?CONFD_UINT32(V),_) ->
                                      K = ec_genet:get_elem(Tctx, LLPath, <<"1:1">>),
@@ -422,7 +433,8 @@ get_mappings(HLPath) when is_list(HLPath) ->
             LLPath = [k,'many-to-one',leafs,structure,?LLROOT],
             #mappings{path=LLPath,
                       fupval=ec_genet:value_fun(fun(V) ->
-                                                        list_to_integer(hd(tl(string:tokens(binary_to_list(V), ":"))))
+                                                        Tokens = string:tokens(binary_to_list(V), ":"),
+                                                        list_to_integer(hd(tl(Tokens)))
                                                 end),
                       fdnval=fun(Tctx,_,?CONFD_UINT32(V),_) ->
                                      K = ec_genet:get_elem(Tctx, LLPath, <<"1:1">>),
@@ -486,9 +498,10 @@ get_mappings(HLPath) when is_list(HLPath) ->
                                 (_,_,_,_) -> KB end
                      };
         [c,{KB},a,union,'split-by-rows',lists,structure,?HLROOT] ->
+            UPath = [union,'split-by-rows',lists,structure,?LLROOT],
             #mappings{inherit=tl(HLPath),
-                      nested=[#mappings{path=[m,{KB},ipv4,union,'split-by-rows',lists,structure,?LLROOT]},
-                              #mappings{path=[m,{KB},ipv6,union,'split-by-rows',lists,structure,?LLROOT]}],
+                      nested=[#mappings{path=[m,{KB},ipv4 | UPath]},
+                              #mappings{path=[m,{KB},ipv6 | UPath]}],
                       fupval=fun(_,_,[not_found,not_found],_) -> not_found;
                                 (_,_,[_,not_found],_) -> ?ex_ipv4;
                                 (_,_,[not_found,_],_) -> ?ex_ipv6;
@@ -500,7 +513,7 @@ get_mappings(HLPath) when is_list(HLPath) ->
                                                    ?CONFD_ENUM_VALUE(?ex_both) -> [ipv4,ipv6]
                                                end,
                                        ec_genet:switch_discriminator(Tctx,
-                                                                     [union,'split-by-rows',lists,structure,?LLROOT],
+                                                                     UPath,
                                                                      [[{KB},ipv4], [{KB},ipv6]],
                                                                      [[{KB},Prot] || Prot <- Prots])
                                end
@@ -539,7 +552,7 @@ get_mappings(HLPath) when is_list(HLPath) ->
         [a,sequencing,lists,structure,?HLROOT] ->
             #mappings{get_next=ec_genet:ordering_get_next([k,sequencing,lists,structure,?LLROOT],
                                                           fun ({KBin}) ->
-                                                                  {?CONFD_UINT32(list_to_integer(binary_to_list(KBin)))}
+                                                                  {?CONFD_UINT32(binary_to_integer(KBin))}
                                                           end)};
         [{?CONFD_UINT32(X)},a,sequencing,lists,structure,?HLROOT] ->
             #mappings{path=[{list_to_binary(integer_to_list(X))},k,sequencing,lists,structure,?LLROOT]};
@@ -551,6 +564,50 @@ get_mappings(HLPath) when is_list(HLPath) ->
         [c,{_},a,sequencing,lists,structure,?HLROOT] ->
             #mappings{inherit=tl(HLPath),
                       relpath=[m]};
+
+        %% The two list are supposed to have reverse order, so we need
+        %% to take all keys from the LL list and return them one by
+        %% one reversed.
+        [a,ordered,lists,structure,?HLROOT] ->
+            Path = [k,ordered,lists,structure,?LLROOT],
+            #mappings{path=Path,
+                      get_next=fun ec_genet:constant_keyset_get_next/4,
+                      %% fupkeys is not necessary really, the
+                      %% automatic conversion would cover that
+                      fupkeys=fun(_,_,false,_) ->
+                                      false;
+                                 (_,_,{L, ?CONFD_UINT8(M)},_) ->
+                                      {L, integer_to_binary(M)}
+                              end,
+                      extra=fun(Tctx) ->
+                                    M = ec_genet_server:tctx_maapi_sock(Tctx),
+                                    TH = ec_genet_server:tctx_maapi_thandle(Tctx),
+                                    {ok, LLEntries} = econfd_maapi:all_keys(M, TH, Path),
+                                    LLEntries % all_keys returns the list in reverse order!
+                            end};
+        %% This mapping needs to handle:
+        %%  * create - maps directly to LL, but since entries are
+        %%    appended to the end and the ordering is reversed, we
+        %%    need to move the new entry to the first position
+        %%  * delete - mapped directly to LL
+        %%  * move_after - mapped to move after to LL
+        [{B, C},a,ordered,lists,structure,?HLROOT] ->
+            Path = [{B, ?CONFD_UINT8(binary_to_integer(C))},k,ordered,lists,structure,?LLROOT],
+            ec_genet_mapgens:post_hook(
+              #mappings{path=Path,
+                        %% fdnval is invoked only for move_after; the
+                        %% argument is either {} (meaning the "first"
+                        %% position) or a key set
+                        fdnval=ec_genet:value_fun(fun({}) ->
+                                                          last;
+                                                     ({B2,C2}) ->
+                                                          {before,{B2,?CONFD_UINT8(binary_to_integer(C2))}}
+                                                  end)},
+              #mappings{create=fun(Tctx,_,_) ->
+                                       ec_genet:move_after(Tctx,Path,first)
+                               end});
+        [b,{B,C},a,ordered,lists,structure,?HLROOT] ->
+            #mappings{path=[l,{B, ?CONFD_UINT8(binary_to_integer(C))},k,ordered,lists,structure,?LLROOT]};
 
         %% Mapping a nested list to flat list requires handling of several cases, some of
         %% them a bit tricky; the macro NESTED_TO_FLAT tries to do that as generally as
@@ -595,7 +652,8 @@ get_mappings(HLPath) when is_list(HLPath) ->
         [a,'list-to-leaf-list',structure,?HLROOT] ->
             #mappings{get_next=fun ec_genet:constant_keyset_get_next/4,
                       extra=fun(Tctx) ->
-                                    [{X} || X <- ec_genet:get_elem(Tctx, [k,'list-to-leaf-list',structure,?LLROOT], [])]
+                                    LLPath = [k,'list-to-leaf-list',structure,?LLROOT],
+                                    [{X} || X <- ec_genet:get_elem(Tctx, LLPath, [])]
                             end};
         [{X},a,'list-to-leaf-list',structure,?HLROOT] ->
             LLPath = [k,'list-to-leaf-list',structure,?LLROOT],
@@ -715,13 +773,14 @@ get_mappings(HLPath) when is_list(HLPath) ->
             %% task of the nested mappings - the first one sets/retrieves the value (and
             %% only this value is used in fupval), the second deletes in case of the set
             %% operation
+            FOpMapFun = fun(Tctx,set_elem,Path,Arg,Mappings) ->
+                                {Tctx,delete,Path,Arg,Mappings};
+                           (Tctx,_,Path,Arg,Mappings) ->
+                                {Tctx,nop,Path,Arg,Mappings}
+                        end,
             ec_genet_mapgens:guard_by_value(#mappings{nested=[#mappings{path=[l,'case-map',existence,?LLROOT]},
                                                               #mappings{path=[m,'case-map',existence,?LLROOT],
-                                                                        fopmap=fun(Tctx,set_elem,Path,Arg,Mappings) ->
-                                                                                       {Tctx,delete,Path,Arg,Mappings};
-                                                                                  (Tctx,_,Path,Arg,Mappings) ->
-                                                                                       {Tctx,nop,Path,Arg,Mappings}
-                                                                               end}],
+                                                                        fopmap=FOpMapFun}],
                                                       fupval=fun(_,_,[Val,_],_) -> Val end},
                                             [k,'case-map',existence,?LLROOT],
                                             ?CONFD_ENUM_VALUE(?exdev_case_e));

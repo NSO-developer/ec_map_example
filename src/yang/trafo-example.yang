@@ -127,7 +127,7 @@ module trafo-example {
         description
           "This is a leaf-list, i.e. a leaf that can hold multiple
           values.  From the mapping logic perspective, it behaves
-          pretty much the same as a usual leaf.  PERFECT mapping.";
+          a lot like a standard list.  PERFECT mapping.";
         leaf-list a {
           type int8;
         }
@@ -145,6 +145,14 @@ module trafo-example {
           leaf b {
             type string;
           }
+        }
+      }
+      container ordered-leaf-list {
+        description
+          "A simple leaf-list, but ordered by user.  PERFECT mapping.";
+        leaf-list a {
+          type string;
+          ordered-by user;
         }
       }
     }
@@ -788,6 +796,24 @@ module trafo-example {
             }
             leaf c {
               type string;
+            }
+          }
+        }
+        container ordered {
+          description
+            "We are reverting the order of the two user-ordered lists;
+             at the same time, some type conversion takes place.
+             PERFECT mapping.";
+          list a {
+            ordered-by user;
+            key "b c";
+            leaf b {
+              type uint32;
+            }
+            leaf c {
+              type string {
+                pattern "0|[1-9][0-9]*";
+              }
             }
           }
         }

@@ -63,6 +63,13 @@
     genet-cfg#
     """
     [invoke test-direct leaf-list "[ 12 14 ]"]
+    [invoke test-direct ordered-leaf-list "[ 12 14 ]"]
+    !insert example-domain direct ordered-leaf-list a 13 before 14
+    !insert example-domain direct ordered-leaf-list a 11 first
+    !insert example-domain direct ordered-leaf-list a 15 last
+    [invoke commit]
+    !do show running-config example-domain direct ordered-leaf-list a
+    ???example-domain direct ordered-leaf-list a [ 11 12 13 14 15 ]
     [invoke test-ex-common "direct list a" 12 $noentries]
     [invoke test-ex-common "direct list a" 14 "direct list a 12"]
 

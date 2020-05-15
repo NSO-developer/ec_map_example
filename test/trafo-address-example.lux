@@ -271,6 +271,62 @@
     """
 
     """!
+    example-domain structure lists ordered a 3 3
+    example-domain structure lists ordered a 5 5
+    """
+    [invoke commit]
+    !do show running-config example-domain structure lists ordered
+    """?
+    example-domain structure lists ordered a 3 3
+    !
+    example-domain structure lists ordered a 5 5
+    !
+    genet-cfg#
+    """
+    !insert example-domain structure lists ordered a 2 2 before 3 3
+    !insert example-domain structure lists ordered a 1 1 first
+    !insert example-domain structure lists ordered a 7 7 last
+    !insert example-domain structure lists ordered a 6 6 after 5 5
+    !insert example-domain structure lists ordered a 4 4 after 3 3
+    [invoke commit]
+    !do show running-config example-domain structure lists ordered
+    """?
+    example-domain structure lists ordered a 1 1
+    !
+    example-domain structure lists ordered a 2 2
+    !
+    example-domain structure lists ordered a 3 3
+    !
+    example-domain structure lists ordered a 4 4
+    !
+    example-domain structure lists ordered a 5 5
+    !
+    example-domain structure lists ordered a 6 6
+    !
+    example-domain structure lists ordered a 7 7
+    !
+    genet-cfg#
+    """
+    !do show running-config example-device structure lists ordered
+    """?
+    example-device structure lists ordered k 7 7
+    !
+    example-device structure lists ordered k 6 6
+    !
+    example-device structure lists ordered k 5 5
+    !
+    example-device structure lists ordered k 4 4
+    !
+    example-device structure lists ordered k 3 3
+    !
+    example-device structure lists ordered k 2 2
+    !
+    example-device structure lists ordered k 1 1
+    !
+    genet-cfg#
+    """
+
+    """!
     example-domain structure nested-lists nested-list-to-flat a 12 c abcd e false
     example-domain structure nested-lists nested-list-to-flat a 12 c efgh e true
     example-domain structure nested-lists nested-list-to-flat a 34 c ijkl
@@ -419,7 +475,7 @@
 
     [progress operational tests]
 [shell load]
-    !ncs_load -C -l -m < keyless.xml
+    !ncs_load -O -l -m < keyless.xml
     !echo loaded: $$?
     ?loaded: 0
 [shell genet_cli]

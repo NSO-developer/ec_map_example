@@ -419,7 +419,7 @@
 
     [progress operational tests]
 [shell load]
-    !ncs_load -C -l -m < keyless.xml
+    !ncs_load -O -l -m < keyless.xml
     !echo loaded: $$?
     ?loaded: 0
 [shell genet_cli]

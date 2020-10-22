@@ -77,6 +77,12 @@ module trafo-example-device {
           }
         }
       }
+      container ordered-leaf-list {
+        leaf-list k {
+          type string;
+          ordered-by user;
+        }
+      }
     }
 
     container types {
@@ -484,6 +490,18 @@ module trafo-example-device {
             }
             leaf m {
               type string;
+            }
+          }
+        }
+        container ordered {
+          list k {
+            ordered-by user;
+            key "l m";
+            leaf l {
+              type int32;
+            }
+            leaf m {
+              type uint8;
             }
           }
         }

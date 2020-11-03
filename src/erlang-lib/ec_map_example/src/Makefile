@@ -13,6 +13,8 @@ HRL_FILES  = $(wildcard *.hrl) $(NS_FILES)
 MODULES    = $(ERL_FILES:%.erl=%)
 EBIN_FILES = $(MODULES:%=../ebin/%.beam) ../ebin/$(APP_NAME).app
 
+GENET_INCLUDE ?= $(GENET)/src/erlang-lib/ec_genet/include
+
 $(NS_DIR)/%.hrl: $(YANG_DIR)/%.yang
 	$(COMPILER) --emit-hrl $@ \
 		--yangpath $(SYSTEM_DIR)/src/$(SYSTEM)/yang \
@@ -21,7 +23,7 @@ $(NS_DIR)/%.hrl: $(YANG_DIR)/%.yang
 ERLC       = erlc
 ERLC_FLAGS := \
 	+debug_info \
-	-I $(GENET)/src/erlang-lib/ec_genet/include -I $(NS_DIR) \
+	-I $(GENET_INCLUDE) -I $(NS_DIR) \
 	-pa $(SYSTEM_DIR)/erlang/econfd/ebin \
 	-pa ../../ec_map_example/ebin
 
